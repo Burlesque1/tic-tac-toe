@@ -2,11 +2,15 @@
 
 player::player(){
 	
-	state = {{X, X, X, O}, {O, X, X, X}, {O, O, E, E}, {O, E, E, E}};
+//	state = {{X, X, X, O}, {O, X, X, X}, {O, O, E, E}, {O, E, E, E}};
+	
+	state = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
 	
 	next_move.first = -1;
 	
 	next_move.second = -1;
+	
+	memo = unordered_map<long long, int>();
 }
 
 long long player::show_recurr(){
@@ -15,22 +19,24 @@ long long player::show_recurr(){
 	
 }
 
-void player::get_board(vector<vector<entry>> board, int step){
-		
-		curr_step = step;
-		
-		state = board;	// can be optimized 
+void player::test(){
+	for(auto m:memo){
+		cout<<m.first<<" "<<m.second<<endl;
+	}
 }
 
 void player::get_last_move(pair<int, int> last_move, int step){
 	
 	int row = last_move.first, column = last_move.second;
 	
-	state[row][column] = O;
+	curr_step = step;	
 	
-	curr_step = step;
+	if(row != -1 && column != -1){
+		
+		state[row][column] = O;
 	
-	curr_encode += pow(3, (row * BOARD_COLUMN + column));
+		curr_encode += pow(3, (row * BOARD_COLUMN + column));
+	}
 }	
 
 pair<int, int> player::return_move(){	
@@ -51,7 +57,7 @@ long long player::generate_encode(int row, int column){
 }
 
 
-int player::return_utility(vector<vector<entry>> &state){
+int player::terminal_test(vector<vector<entry>> &state){
 	int res = 0;
 	// chcek rows
 	for(int i=0;i<BOARD_ROW;i++){
@@ -114,7 +120,7 @@ int player::return_utility(vector<vector<entry>> &state){
 void player::alpha_beta_search(){
 	// if first step set X into middle
 	;
-	
+	cout<<state[0][0]<<" dsfdas "<<endl;
 	cout<<"curr step "<<curr_step<<endl;
 	next_move.first = -1;
 	next_move.second = -1;
@@ -128,12 +134,16 @@ void player::alpha_beta_search(){
 				next_move.second = j;
 			}
 			state[i][j] = X;
-			int max_u = 1000, min_u = -1000;	
-			time_t start = time(nullptr);
+			
+			int max_u = 1000, min_u = -1000;
+			
+			time_t start = time(nullptr);	
 			int v = min_value(min_u, max_u, curr_step+1);
 			
 			state[i][j] = E;
-			cout<<v<<" i = "<<i<<" j = "<<j<<endl;	
+			
+			cout<<time(nullptr)-start<<"s "<<v<<" i = "<<i<<" j = "<<j<<endl;	
+			
 			if(v > value){
 				value = v;
 				next_move.first = i;
@@ -145,48 +155,82 @@ void player::alpha_beta_search(){
 }
 
 int player::min_value(int &alpha, int &beta, int steps){
+	
 	recurr_count++;
-	int utility = return_utility(state);
-	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN)
+	
+	if(memo.find(curr_encode) != memo.end())
+		return memo[curr_encode];
+		
+	int utility = terminal_test(state);
+	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
+		memo[curr_encode] = utility;	
 		return utility;
+	}
 	
 	int v = 1000;
 	for(int i=0;i<BOARD_ROW;i++){
 		for(int j=0;j<BOARD_COLUMN;j++){
 			if(state[i][j] != E)
 				continue;
+			
 			state[i][j] = O;
+			curr_encode += pow(3, (i * BOARD_COLUMN + j));
+			
 			v = min(v, max_value(alpha, beta, steps+1));
+			
 			state[i][j] = E;
+			curr_encode -= pow(3, (i * BOARD_COLUMN + j));
+			
 			if(v <= alpha){
+				if(steps >= 5 && steps <= 7)
+					memo[curr_encode] = v;
 				return v;
 			}
 			beta = min(v, beta);
 		}		
 	}
+	if(steps >= 3)
+		memo[curr_encode] = v;	
 	return v;
 }
 
 int player::max_value(int &alpha, int &beta, int steps){
+	
 	recurr_count++;
-	int utility = return_utility(state);
-	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN)
+	
+	if(memo.find(curr_encode) != memo.end())
+		return memo[curr_encode];
+		
+	int utility = terminal_test(state);
+	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
+		memo[curr_encode] = utility;	
 		return utility;
+	}
 	
 	int v = -1000;
 	for(int i=0;i<BOARD_ROW;i++){
 		for(int j=0;j<BOARD_COLUMN;j++){
 			if(state[i][j] != E)	
 				continue;
-			state[i][j] = X;	
+			
+			state[i][j] = X;
+			curr_encode += 2*pow(3, (i * BOARD_COLUMN + j));
+			
 			v = max(v, min_value(alpha, beta, steps+1));
+			
 			state[i][j] = E;
+			curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
+			
 			if(v>=beta){
+				if(steps >= 5 && steps <= 7)
+					memo[curr_encode] = v;	
 				return v;
 			}
 			alpha = max(alpha, v);
 		}
 	}
+	if(steps >= 3)
+		memo[curr_encode] = v;	
 	return v;
 }
 

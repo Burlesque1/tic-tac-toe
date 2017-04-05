@@ -31,7 +31,8 @@ int main(int argc, char** argv) {
 			break;
 		
 		cout<<"\ntotal time "<<time(nullptr)-start<<endl;
-		cout<<"total recurrence count "<<max_p.show_recurr()<<"\n"<<endl;
+//		max_p.test();
+		cout<<"\ntotal recurrence count "<<max_p.show_recurr()<<"\n"<<endl;
 		
 		
 		// player min's turn

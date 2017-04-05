@@ -10,6 +10,8 @@ private:
 	
 	int curr_step;
 	
+	int depth;
+	
 	long long curr_encode;
 	
 	static long long recurr_count;	
@@ -20,7 +22,7 @@ private:
 	
 	long long generate_encode(int row, int column);
 	
-	int return_utility(vector<vector<entry>> &state);
+	int terminal_test(vector<vector<entry>> &state);
 	
 	// search
 	void alpha_beta_search();
@@ -32,11 +34,12 @@ private:
 public:	
 	player();
 	
-	void get_board(vector<vector<entry>> board, int step);
+	void test();
 	
 	void get_last_move(pair<int, int> last_move, int step);
 	
 	long long show_recurr();
+	
 	// move
 	pair<int, int> return_move();
 };

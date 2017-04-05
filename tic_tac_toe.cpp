@@ -1,12 +1,18 @@
 #include "tic_tac_toe.h"
 
 tic_tac_toe::tic_tac_toe(){
+		
 		curr_player = X;
-//		step_count = 1; 
-//		board = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
-		step_count = 13; 
-		board = {{X, X, X, O}, {O, X, X, X}, {O, O, E, O}, {O, E, E, E}};
-		last_move = make_pair(2, 3);
+		
+		step_count = 1; 
+		
+		board = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
+		
+		last_move = make_pair(-1, -1);
+
+//		step_count = 13; 
+//		board = {{X, X, X, O}, {O, X, X, X}, {O, O, E, O}, {O, E, E, E}};
+		
 	} 
 
 int tic_tac_toe::return_step(){
