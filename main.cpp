@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 		
 		
 		// player min's turn
-		//t.show_info();
+//		t.show_info();
 		t.print_board();
 		int r = 0, c = 0;
 		cin>>r>>c;
