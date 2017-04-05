@@ -2,24 +2,54 @@
 
 player::player(){
 	
+	state = {{X, X, X, O}, {O, X, X, X}, {O, O, E, E}, {O, E, E, E}};
+	
 	next_move.first = -1;
 	
 	next_move.second = -1;
 }
 
 long long player::show_recurr(){
+	
 	return recurr_count;
+	
 }
 
 void player::get_board(vector<vector<entry>> board, int step){
+		
 		curr_step = step;
+		
 		state = board;	// can be optimized 
-	}
+}
+
+void player::get_last_move(pair<int, int> last_move, int step){
 	
+	int row = last_move.first, column = last_move.second;
+	
+	state[row][column] = O;
+	
+	curr_step = step;
+	
+	curr_encode += pow(3, (row * BOARD_COLUMN + column));
+}	
+
 pair<int, int> player::return_move(){	
+	
 	alpha_beta_search();
+	
+	state[next_move.first][next_move.second] = X;
+	
+	curr_encode += 2*pow(3, (next_move.first * BOARD_COLUMN + next_move.second));
+	
 	return next_move;
 }
+
+
+long long player::generate_encode(int row, int column){
+	
+	return curr_encode + pow(3, (row * BOARD_COLUMN + column));
+}
+
 
 int player::return_utility(vector<vector<entry>> &state){
 	int res = 0;
@@ -84,6 +114,7 @@ int player::return_utility(vector<vector<entry>> &state){
 void player::alpha_beta_search(){
 	// if first step set X into middle
 	;
+	
 	cout<<"curr step "<<curr_step<<endl;
 	next_move.first = -1;
 	next_move.second = -1;
@@ -100,8 +131,7 @@ void player::alpha_beta_search(){
 			int max_u = 1000, min_u = -1000;	
 			time_t start = time(nullptr);
 			int v = min_value(min_u, max_u, curr_step+1);
-			cout<<"time "<<time(nullptr)-start<<endl;
-			cout<<"recurrence count "<<show_recurr()<<endl;
+			
 			state[i][j] = E;
 			cout<<v<<" i = "<<i<<" j = "<<j<<endl;	
 			if(v > value){

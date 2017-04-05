@@ -19,14 +19,21 @@ int main(int argc, char** argv) {
 		t.print_board();
 		
 		time_t start = time(nullptr);
+		
 		// player max's turn
-		max_p.get_board(t.return_board(), t.return_step());
+//		max_p.get_board(t.return_board(), t.return_step());
+		max_p.get_last_move(t.return_last_move(), t.return_step());
+		
 		pair<int, int> move = max_p.return_move();
+	
 		bool if_over = t.next(move.first, move.second, X);
 		if(if_over)
 			break;
-		cout<<"total time "<<time(nullptr)-start<<endl;
-		cout<<"total recurrence count "<<max_p.show_recurr()<<endl;
+		
+		cout<<"\ntotal time "<<time(nullptr)-start<<endl;
+		cout<<"total recurrence count "<<max_p.show_recurr()<<"\n"<<endl;
+		
+		
 		// player min's turn
 		//t.show_info();
 		t.print_board();

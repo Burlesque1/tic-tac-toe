@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+#include <unordered_map>
+#include <cmath>
 
 #define BOARD_ROW 4
 #define BOARD_COLUMN 4
@@ -22,6 +24,8 @@ private:
 	
 	bool check_winner(int row, int column);
 	
+	pair<int, int> last_move;
+	
 	int step_count;
 	
 	entry curr_player;
@@ -37,6 +41,8 @@ public:
 	vector<vector<entry>> return_board();
 	
 	int return_step();
+	
+	pair<int, int> return_last_move();
 	
 	void show_info();
 	

@@ -2,10 +2,11 @@
 
 tic_tac_toe::tic_tac_toe(){
 		curr_player = X;
-		step_count = 1; 
-		board = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
-//		step_count = 13; 
-//		board = {{X, X, X, O}, {O, X, X, X}, {O, O, E, O}, {O, E, E, E}};
+//		step_count = 1; 
+//		board = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
+		step_count = 13; 
+		board = {{X, X, X, O}, {O, X, X, X}, {O, O, E, O}, {O, E, E, E}};
+		last_move = make_pair(2, 3);
 	} 
 
 int tic_tac_toe::return_step(){
@@ -14,6 +15,10 @@ int tic_tac_toe::return_step(){
 
 vector<vector<entry>> tic_tac_toe::return_board(){
 	return board;
+}
+
+pair<int, int> tic_tac_toe::return_last_move(){
+	return last_move;
 }
 
 bool tic_tac_toe::check_input(int row, int column){
@@ -27,7 +32,11 @@ bool tic_tac_toe::check_input(int row, int column){
 bool tic_tac_toe::next(int row, int column, entry en){
 	
 	board[row][column] = en;
+	
 	++step_count;
+	
+	last_move = make_pair(row, column);
+	
 	// 	check winner before return
 	return check_winner(row, column);
 }
