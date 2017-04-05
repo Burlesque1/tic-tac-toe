@@ -4,13 +4,13 @@ tic_tac_toe::tic_tac_toe(){
 		
 		curr_player = X;
 		
-//		step_count = 1; 		
-//		board = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
+		step_count = 1; 		
+		board = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
 		
 		last_move = make_pair(-1, -1);
 
-		step_count = 9; 
-		board = {{X, X, X, O}, {O, X, X, O}, {O, E, E, E}, {O, E, E, E}};
+//		step_count = 11; 
+//		board = {{X, X, X, O}, {O, X, X, O}, {O, E, E, E}, {O, E, E, E}};
 		
 	} 
 

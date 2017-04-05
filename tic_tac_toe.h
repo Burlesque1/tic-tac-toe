@@ -7,6 +7,7 @@
 #define BOARD_ROW 4
 #define BOARD_COLUMN 4
 #define TARGET 4
+#define DEPTH_LIMIT 8
 
 using namespace std; 
 

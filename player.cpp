@@ -2,9 +2,9 @@
 
 player::player(){
 	
-	state = {{X, X, X, O}, {O, X, X, O}, {O, E, E, E}, {O, E, E, E}};
+//	state = {{X, X, X, O}, {O, X, X, O}, {O, E, E, E}, {O, E, E, E}};
 	
-//	state = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
+	state = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
 	
 	curr_encode = 0;
 	
@@ -123,7 +123,7 @@ int player::terminal_test(vector<vector<entry>> &state){
 void player::alpha_beta_search(){
 	// if first step set X into middle
 	;
-	cout<<state[0][0]<<" dsfdas "<<endl;
+	
 	cout<<"curr step "<<curr_step<<endl;
 	next_move.first = -1;
 	next_move.second = -1;
@@ -137,7 +137,9 @@ void player::alpha_beta_search(){
 				next_move.second = j;
 			}
 			state[i][j] = X;
+			
 			curr_encode += 2*pow(3, (i * BOARD_COLUMN + j));
+			
 			int max_u = 1000, min_u = -1000;
 			
 			time_t start = time(nullptr);
@@ -163,8 +165,8 @@ int player::min_value(int &alpha, int &beta, int steps){
 //	cout<<curr_encode<<" min "<<endl;
 	recurr_count++;
 	
-//	if(memo.find(curr_encode) != memo.end())
-//		return memo[curr_encode];
+	if(memo.find(curr_encode) != memo.end())
+		return memo[curr_encode];
 		
 	int utility = terminal_test(state);
 	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
@@ -173,7 +175,6 @@ int player::min_value(int &alpha, int &beta, int steps){
 	}
 	
 	int v = 1000;
-//	long long min_encoding = curr_encode;
 	for(int i=0;i<BOARD_ROW;i++){
 		for(int j=0;j<BOARD_COLUMN;j++){
 			if(state[i][j] != E)
@@ -183,21 +184,20 @@ int player::min_value(int &alpha, int &beta, int steps){
 			curr_encode += pow(3, (i * BOARD_COLUMN + j));
 			
 			v = min(v, max_value(alpha, beta, steps+1));
-//			min_encoding = rec == v ? 
 			
 			state[i][j] = E;
 			
 			curr_encode -= pow(3, (i * BOARD_COLUMN + j));
 			
 			if(v <= alpha){
-				if(steps >= 3)
+				if(steps >= DEPTH_LIMIT)
 					memo[curr_encode] = v;
 				return v;
 			}
 			beta = min(v, beta);
 		}		
 	}
-	if(steps >= 3)
+	if(steps >= DEPTH_LIMIT)
 		memo[curr_encode] = v;	
 	return v;
 }
@@ -206,8 +206,8 @@ int player::max_value(int &alpha, int &beta, int steps){
 //	cout<<curr_encode<<" max "<<endl;
 	recurr_count++;
 	
-//	if(memo.find(curr_encode) != memo.end())
-//		return memo[curr_encode];
+	if(memo.find(curr_encode) != memo.end())
+		return memo[curr_encode];
 		
 	int utility = terminal_test(state);
 	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
@@ -230,14 +230,14 @@ int player::max_value(int &alpha, int &beta, int steps){
 			curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
 			
 			if(v>=beta){
-				if(steps >= 3)
+				if(steps >= DEPTH_LIMIT)
 					memo[curr_encode] = v;	
 				return v;
 			}
 			alpha = max(alpha, v);
 		}
 	}
-	if(steps >= 3)
+	if(steps >= DEPTH_LIMIT)
 		memo[curr_encode] = v;	
 	return v;
 }
