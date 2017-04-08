@@ -24,12 +24,14 @@ private:
 	
 	int terminal_test(vector<vector<entry>> &state);
 	
+	void print_state();
+	
 	// search
 	void alpha_beta_search();
 	
-	int max_value(int &alpha, int &beta, int steps);
+	int max_value(int row, int column, int alpha, int beta, int steps);
 	
-	int min_value(int &alpha, int &beta, int steps);
+	int min_value(int row, int column, int alpha, int beta, int steps);
 
 public:	
 	player();

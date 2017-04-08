@@ -2,7 +2,7 @@
 
 player::player(){
 	
-//	state = {{X, X, X, O}, {O, X, X, O}, {O, E, E, E}, {O, E, E, E}};
+//	state = {{X, X, X, O}, {X, X, O, E}, {O, X, E, E}, {O, O, O, E}};
 	
 	state = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
 	
@@ -59,6 +59,19 @@ long long player::generate_encode(int row, int column){
 	return curr_encode + pow(3, (row * BOARD_COLUMN + column));
 }
 
+void player::print_state(){
+	cout<<"\n\n\n";
+	for(auto s:state){
+		for(auto ss:s){
+			if(ss == E)
+				cout<<"- ";
+			else
+				cout<<ss<<" ";
+		}
+		cout<<endl;
+	}
+	cout<<endl;
+}
 
 int player::terminal_test(vector<vector<entry>> &state){
 	int res = 0;
@@ -144,7 +157,7 @@ void player::alpha_beta_search(){
 			
 			time_t start = time(nullptr);
 				
-			int v = min_value(min_u, max_u, curr_step+1);
+			int v = min_value(i, j, min_u, max_u, curr_step+1);
 			
 			state[i][j] = E;
 			curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
@@ -161,7 +174,7 @@ void player::alpha_beta_search(){
 //	cout<< curr_encode<<"  dfas "<<endl;
 }
 
-int player::min_value(int &alpha, int &beta, int steps){
+int player::min_value(int row, int column, int alpha, int beta, int steps){
 //	cout<<curr_encode<<" min "<<endl;
 	recurr_count++;
 	
@@ -182,8 +195,15 @@ int player::min_value(int &alpha, int &beta, int steps){
 			
 			state[i][j] = O;
 			curr_encode += pow(3, (i * BOARD_COLUMN + j));
+//			if(row == 1 && column == 3 && steps == 14){
+//				cout<<" min --- "<<v<<" i "<<i<<" j "<<j<<" alpha "<<alpha<<endl;
+//			}
+			v = min(v, max_value(i, j, alpha, beta, steps+1));
 			
-			v = min(v, max_value(alpha, beta, steps+1));
+//			if(row == 1 && column == 3 && steps == 14){
+//				cout<<" --- min "<<v<<" i "<<i<<" j "<<j<<" alpha "<<alpha<<endl;
+////				print_state();
+//			}
 			
 			state[i][j] = E;
 			
@@ -202,7 +222,7 @@ int player::min_value(int &alpha, int &beta, int steps){
 	return v;
 }
 
-int player::max_value(int &alpha, int &beta, int steps){
+int player::max_value(int row, int column, int alpha, int beta, int steps){
 //	cout<<curr_encode<<" max "<<endl;
 	recurr_count++;
 	
@@ -210,6 +230,12 @@ int player::max_value(int &alpha, int &beta, int steps){
 		return memo[curr_encode];
 		
 	int utility = terminal_test(state);
+	
+//	if(row == 3 && column == 3 && steps == 15){
+//		cout<<"max "<<utility<<endl;
+//		print_state();
+//	}
+	
 	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
 		memo[curr_encode] = utility;	
 		return utility;
@@ -224,12 +250,12 @@ int player::max_value(int &alpha, int &beta, int steps){
 			state[i][j] = X;
 			curr_encode += 2*pow(3, (i * BOARD_COLUMN + j));
 			
-			v = max(v, min_value(alpha, beta, steps+1));
+			v = max(v, min_value(i, j, alpha, beta, steps+1));
 			
 			state[i][j] = E;
 			curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
 			
-			if(v>=beta){
+			if(v >= beta){
 				if(steps >= DEPTH_LIMIT)
 					memo[curr_encode] = v;	
 				return v;

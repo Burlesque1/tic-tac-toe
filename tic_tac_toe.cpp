@@ -9,8 +9,8 @@ tic_tac_toe::tic_tac_toe(){
 		
 		last_move = make_pair(-1, -1);
 
-//		step_count = 11; 
-//		board = {{X, X, X, O}, {O, X, X, O}, {O, E, E, E}, {O, E, E, E}};
+//		step_count = 13; 
+//		board = {{X, X, X, O}, {X, X, O, E}, {O, X, E, E}, {O, O, O, E}};
 		
 	} 
 
