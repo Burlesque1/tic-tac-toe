@@ -36,11 +36,9 @@ private:
 public:	
 	player();
 	
-	void test();
+	void print_info();
 	
 	void get_last_move(pair<int, int> last_move, int step);
-	
-	long long show_recurr();
 	
 	// move
 	pair<int, int> return_move();

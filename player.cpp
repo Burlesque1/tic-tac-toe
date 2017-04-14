@@ -15,17 +15,19 @@ player::player(){
 	memo = unordered_map<long long, int>();
 }
 
-long long player::show_recurr(){
+void player::print_info(){
 	
-	return recurr_count;
+	cout<<"(1) no cutoff occurred"<<endl;
 	
-}
-
-void player::test(){
-//	for(auto m:memo){
-//		cout<<m.first<<" "<<m.second<<endl;
-//	}
-	cout<<memo.size()<<endl;
+	cout<<"(2) maximum depth reached: "<<endl;
+	
+	cout<<"(3) total number of nodes generated: "<<recurr_count<<endl;
+	
+	cout<<"(4) max prune times: "<<0<<endl;
+	
+	cout<<"(5) min prune times: "<<0<<endl;
+	
+	cout<<"memo size: "<<memo.size()<<endl;
 }
 
 void player::get_last_move(pair<int, int> last_move, int step){
@@ -53,12 +55,6 @@ pair<int, int> player::return_move(){
 	return next_move;
 }
 
-
-long long player::generate_encode(int row, int column){
-	
-	return curr_encode + pow(3, (row * BOARD_COLUMN + column));
-}
-
 void player::print_state(){
 	cout<<"\n\n\n";
 	for(auto s:state){
@@ -74,6 +70,46 @@ void player::print_state(){
 }
 
 int player::terminal_test(vector<vector<entry>> &state){
+//	cout<<"curr_encode & 14408200 == 14408200 "<<(curr_encode & 14408200 == 14408200)<<endl;
+//	cout<<"(curr_encode - 551880) ^ 551880 "<<((curr_encode - 551880) ^ 551880)<<endl;
+//	cout<<"(curr_encode - 28816400) ^ 28816400 "<<((curr_encode - 28816400) ^ 28816400) <<endl;
+//	cout<<"(curr_encode - 1103760) ^ 1103760 "<<((curr_encode - 1103760) ^ 1103760) <<endl;
+	 
+	// diagnal 
+//	if((curr_encode >= 14408200 && (curr_encode & 14408200) == 14408200) || (curr_encode >= 551880 && (curr_encode & 551880) == 551880))
+//		{
+//			return -1000;
+//		}
+//	
+//	if((curr_encode >= 28816400 && (curr_encode & 28816400) == 28816400) || (curr_encode >= 1103760 && (curr_encode & 1103760) == 1103760))
+//		return 1000;
+//	
+//	// row	
+//	for(int i = 1, p = 40;i < BOARD_ROW;i++, p *= 81){
+//		if(curr_encode < p)
+//			continue;
+//		if((curr_encode & p) == p)
+//			{
+//				cout<<curr_encode<<" d "<<p<<endl;
+//				exit(0);
+//				return -1000;
+//			}
+//		if((curr_encode & 2 * p) == 2 * p)
+//			return 1000;
+//	}
+//	
+//	// column
+//	for(int i = 1, p = 538084;i < BOARD_COLUMN;i++, p *= 3){
+//		if(curr_encode < p)
+//			continue;
+//		if((curr_encode & p) == p)
+//			return -1000;
+//		if((curr_encode & 2 * p) == 2 * p)
+//			return 1000;
+//	}
+//	
+//	return 0;
+	
 	int res = 0;
 	// chcek rows
 	for(int i=0;i<BOARD_ROW;i++){
