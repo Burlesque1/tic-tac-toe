@@ -12,6 +12,10 @@ private:
 	
 	int depth;
 	
+	int max_prune;
+	
+	int min_prune;
+	
 	long long curr_encode;
 	
 	static long long recurr_count;	
@@ -29,9 +33,9 @@ private:
 	// search
 	void alpha_beta_search();
 	
-	int max_value(int row, int column, int alpha, int beta, int steps);
+	int max_value(int row, int column, int alpha, int beta, int steps, int &dep);
 	
-	int min_value(int row, int column, int alpha, int beta, int steps);
+	int min_value(int row, int column, int alpha, int beta, int steps, int &dep);
 
 public:	
 	player();

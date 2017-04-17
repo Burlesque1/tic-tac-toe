@@ -7,6 +7,12 @@ player::player(){
 	state = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
 	
 	curr_encode = 0;
+		
+	depth = 0;
+	
+	max_prune = 0;
+	
+	min_prune = 0;
 	
 	next_move.first = -1;
 	
@@ -19,13 +25,13 @@ void player::print_info(){
 	
 	cout<<"(1) no cutoff occurred"<<endl;
 	
-	cout<<"(2) maximum depth reached: "<<endl;
+	cout<<"(2) maximum depth reached: "<<depth<<endl;
 	
 	cout<<"(3) total number of nodes generated: "<<recurr_count<<endl;
 	
-	cout<<"(4) max prune times: "<<0<<endl;
+	cout<<"(4) number of times pruning occurred(max): "<<max_prune<<endl;
 	
-	cout<<"(5) min prune times: "<<0<<endl;
+	cout<<"(5) number of times pruning occurred(min): "<<min_prune<<endl;
 	
 	cout<<"memo size: "<<memo.size()<<endl;
 }
@@ -181,6 +187,9 @@ void player::alpha_beta_search(){
 		for(int j=0;j<BOARD_COLUMN;j++){		
 			if(state[i][j] != E)				
 				continue;
+				
+			int curr_dep = 1;
+			
 			if(next_move.first == -1){
 				next_move.first = i;
 				next_move.second = j;
@@ -193,7 +202,7 @@ void player::alpha_beta_search(){
 			
 			time_t start = time(nullptr);
 				
-			int v = min_value(i, j, min_u, max_u, curr_step+1);
+			int v = min_value(i, j, min_u, max_u, curr_step+1, curr_dep);
 			
 			state[i][j] = E;
 			curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
@@ -210,19 +219,22 @@ void player::alpha_beta_search(){
 //	cout<< curr_encode<<"  dfas "<<endl;
 }
 
-int player::min_value(int row, int column, int alpha, int beta, int steps){
-//	cout<<curr_encode<<" min "<<endl;
+int player::min_value(int row, int column, int alpha, int beta, int steps, int &curr_dep){
+
 	recurr_count++;
 	
-	if(memo.find(curr_encode) != memo.end())
+	if(memo.find(curr_encode) != memo.end()){
+		depth = max(curr_dep + 1, depth);
 		return memo[curr_encode];
-		
+	}
 	int utility = terminal_test(state);
 	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
-		memo[curr_encode] = utility;	
+		memo[curr_encode] = utility;
+		depth = max(curr_dep + 1, depth);	
 		return utility;
 	}
 	
+	curr_dep++;
 	int v = 1000;
 	for(int i=0;i<BOARD_ROW;i++){
 		for(int j=0;j<BOARD_COLUMN;j++){
@@ -231,15 +243,8 @@ int player::min_value(int row, int column, int alpha, int beta, int steps){
 			
 			state[i][j] = O;
 			curr_encode += pow(3, (i * BOARD_COLUMN + j));
-//			if(row == 1 && column == 3 && steps == 14){
-//				cout<<" min --- "<<v<<" i "<<i<<" j "<<j<<" alpha "<<alpha<<endl;
-//			}
-			v = min(v, max_value(i, j, alpha, beta, steps+1));
 			
-//			if(row == 1 && column == 3 && steps == 14){
-//				cout<<" --- min "<<v<<" i "<<i<<" j "<<j<<" alpha "<<alpha<<endl;
-////				print_state();
-//			}
+			v = min(v, max_value(i, j, alpha, beta, steps+1, curr_dep));
 			
 			state[i][j] = E;
 			
@@ -248,6 +253,8 @@ int player::min_value(int row, int column, int alpha, int beta, int steps){
 			if(v <= alpha){
 				if(steps >= DEPTH_LIMIT)
 					memo[curr_encode] = v;
+				curr_dep--;
+				min_prune++;
 				return v;
 			}
 			beta = min(v, beta);
@@ -255,28 +262,27 @@ int player::min_value(int row, int column, int alpha, int beta, int steps){
 	}
 	if(steps >= DEPTH_LIMIT)
 		memo[curr_encode] = v;	
+	curr_dep--;
 	return v;
 }
 
-int player::max_value(int row, int column, int alpha, int beta, int steps){
-//	cout<<curr_encode<<" max "<<endl;
+int player::max_value(int row, int column, int alpha, int beta, int steps, int &curr_dep){
+	
 	recurr_count++;
 	
-	if(memo.find(curr_encode) != memo.end())
+	if(memo.find(curr_encode) != memo.end()){
+		depth = max(curr_dep + 1, depth);
 		return memo[curr_encode];
+	}
 		
 	int utility = terminal_test(state);
-	
-//	if(row == 3 && column == 3 && steps == 15){
-//		cout<<"max "<<utility<<endl;
-//		print_state();
-//	}
-	
 	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
 		memo[curr_encode] = utility;	
+		depth = max(curr_dep + 1, depth);
 		return utility;
 	}
 	
+	curr_dep++;
 	int v = -1000;
 	for(int i=0;i<BOARD_ROW;i++){
 		for(int j=0;j<BOARD_COLUMN;j++){
@@ -286,7 +292,7 @@ int player::max_value(int row, int column, int alpha, int beta, int steps){
 			state[i][j] = X;
 			curr_encode += 2*pow(3, (i * BOARD_COLUMN + j));
 			
-			v = max(v, min_value(i, j, alpha, beta, steps+1));
+			v = max(v, min_value(i, j, alpha, beta, steps+1, curr_dep));
 			
 			state[i][j] = E;
 			curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
@@ -294,13 +300,16 @@ int player::max_value(int row, int column, int alpha, int beta, int steps){
 			if(v >= beta){
 				if(steps >= DEPTH_LIMIT)
 					memo[curr_encode] = v;	
+				curr_dep--;
+				max_prune++;
 				return v;
 			}
 			alpha = max(alpha, v);
 		}
 	}
 	if(steps >= DEPTH_LIMIT)
-		memo[curr_encode] = v;	
+		memo[curr_encode] = v;
+	curr_dep--;	
 	return v;
 }
 
