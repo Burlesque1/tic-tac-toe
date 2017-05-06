@@ -8,6 +8,10 @@ private:
 	// board state
 	vector<vector<entry>> state;
 	
+	int ai_level;
+	
+	bool cutoff;
+	 
 	int curr_step;
 	
 	int depth;
@@ -21,7 +25,6 @@ private:
 	static long long recurr_count;	
 	
 	// <encoding, utility>
-	// use bloom filter instead?
 	unordered_map<long long, int> memo;
 	
 	long long generate_encode(int row, int column);
@@ -38,7 +41,7 @@ private:
 	int min_value(int row, int column, int alpha, int beta, int steps, int &dep);
 
 public:	
-	player();
+	player(int level);
 	
 	void print_info();
 	

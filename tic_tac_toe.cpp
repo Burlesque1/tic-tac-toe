@@ -118,12 +118,19 @@ void tic_tac_toe::show_info(){
 }
 
 void tic_tac_toe::print_board(){
+	cout<<"\ncurrent board:"<<endl;
 	for(auto b:board){
 		for(auto bb:b){
 			if(bb == E)
 				cout<<"- ";	
-			else
-				cout<<bb<<" ";
+			else{
+				string tmp;
+				if(bb == X)
+					tmp = "X";
+				if(bb == O)
+					tmp = "O";
+				cout<<tmp<<" ";
+			}
 		}
 		cout<<endl;
 	}

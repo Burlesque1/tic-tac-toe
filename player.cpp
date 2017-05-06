@@ -1,10 +1,14 @@
 #include "player.h"
 
-player::player(){
+player::player(int level){
 	
 //	state = {{X, X, X, O}, {X, X, O, E}, {O, X, E, E}, {O, O, O, E}};
 	
 	state = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
+	
+	ai_level = level;
+	
+	cutoff = false;
 	
 	curr_encode = 0;
 		
@@ -23,7 +27,10 @@ player::player(){
 
 void player::print_info(){
 	
-	cout<<"(1) no cutoff occurred"<<endl;
+	if(!cutoff)
+		cout<<"(1) no cutoff occurred"<<endl;
+	else
+		cout<<"(1) cutoff occurrs"<<endl;
 	
 	cout<<"(2) maximum depth reached: "<<depth<<endl;
 	
@@ -33,7 +40,7 @@ void player::print_info(){
 	
 	cout<<"(5) number of times pruning occurred(min): "<<min_prune<<endl;
 	
-	cout<<"memo size: "<<memo.size()<<endl;
+//	cout<<"memo size: "<<memo.size()<<endl;
 }
 
 void player::get_last_move(pair<int, int> last_move, int step){
@@ -179,54 +186,69 @@ void player::alpha_beta_search(){
 	// if first step set X into middle
 	;
 	
-	cout<<"curr step "<<curr_step<<endl;
+//	cout<<"curr step "<<curr_step<<endl;
 	next_move.first = -1;
 	next_move.second = -1;
-	int value = -1000;
-	for(int i=0;i<BOARD_ROW;i++){
-		for(int j=0;j<BOARD_COLUMN;j++){		
-			if(state[i][j] != E)				
-				continue;
-				
-			int curr_dep = 1;
-			
-			if(next_move.first == -1){
-				next_move.first = i;
-				next_move.second = j;
-			}
-			state[i][j] = X;
-			
-			curr_encode += 2*pow(3, (i * BOARD_COLUMN + j));
-			
-			int max_u = 1000, min_u = -1000;
-			
-			time_t start = time(nullptr);
-				
-			int v = min_value(i, j, min_u, max_u, curr_step+1, curr_dep);
-			
-			state[i][j] = E;
-			curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
-			cout<<time(nullptr)-start<<"s "<<v<<" i = "<<i<<" j = "<<j<<endl;	
-			
-			if(v > value){
-				value = v;
-				next_move.first = i;
-				next_move.second = j;
-				cout<<"value = "<<value<<" i= "<<i<<" j= "<<j<<endl;			
+	cutoff = false;
+	
+	if(ai_level == 1){
+		for(int i=0;i<BOARD_ROW;i++){
+			for(int j=0;j<BOARD_COLUMN;j++){
+				if(state[i][j] == E){
+					next_move.first = i;
+					next_move.second = j;
+					return;
+				}		
 			}
 		}
 	}
-//	cout<< curr_encode<<"  dfas "<<endl;
+	else{
+		int value = -1000;
+		for(int i=0;i<BOARD_ROW;i++){
+			for(int j=0;j<BOARD_COLUMN;j++){		
+				if(state[i][j] != E)				
+					continue;
+					
+				int curr_dep = 1;
+				
+				if(next_move.first == -1){
+					next_move.first = i;
+					next_move.second = j;
+				}
+				state[i][j] = X;
+				
+				curr_encode += 2*pow(3, (i * BOARD_COLUMN + j));
+				
+				int max_u = 1000, min_u = -1000;
+				
+				time_t start = time(nullptr);
+					
+				int v = min_value(i, j, min_u, max_u, curr_step+1, curr_dep);
+				
+				state[i][j] = E;
+				curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
+	//			cout<<time(nullptr)-start<<"s "<<v<<" i = "<<i<<" j = "<<j<<endl;	
+				
+				if(v > value){
+					value = v;
+					next_move.first = i;
+					next_move.second = j;
+	//				cout<<"value = "<<value<<" i= "<<i<<" j= "<<j<<endl;			
+				}
+			}
+		}
+	}
 }
 
 int player::min_value(int row, int column, int alpha, int beta, int steps, int &curr_dep){
 
 	recurr_count++;
 	
-	if(memo.find(curr_encode) != memo.end()){
+	if(ai_level == 3 && memo.find(curr_encode) != memo.end()){
 		depth = max(curr_dep + 1, depth);
 		return memo[curr_encode];
 	}
+	
 	int utility = terminal_test(state);
 	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
 		memo[curr_encode] = utility;
@@ -270,7 +292,7 @@ int player::max_value(int row, int column, int alpha, int beta, int steps, int &
 	
 	recurr_count++;
 	
-	if(memo.find(curr_encode) != memo.end()){
+	if(ai_level == 3 && memo.find(curr_encode) != memo.end()){
 		depth = max(curr_dep + 1, depth);
 		return memo[curr_encode];
 	}
@@ -280,6 +302,81 @@ int player::max_value(int row, int column, int alpha, int beta, int steps, int &
 		memo[curr_encode] = utility;	
 		depth = max(curr_dep + 1, depth);
 		return utility;
+	}
+	
+	if(ai_level == 2 && curr_dep >= 4){
+		int x1 = 0, x2 = 0, x3 = 0;
+		int o1 = 0, o2 = 0, o3 = 0;
+		int count_o = 0, count_x = 0;
+		int eval = 0;
+		// check rows
+		for(int i=0;i<BOARD_ROW;i++){
+			for(int j=0;j<BOARD_COLUMN;j++){
+				if(state[i][j] == X)	
+					count_x++;
+				if(state[i][j] == O)
+					count_o++;
+			}
+
+			switch(count_x){
+				case 1:x1++;break;
+				case 2:x2++;break;
+				case 3:x3++;break;
+			}
+			
+			switch(count_o){
+				case 1:o1++;break;
+				case 2:o2++;break;
+				case 3:o3++;break;
+			}
+		}
+		
+		count_x = 0, count_o = 0;
+		// check columns
+		for(int j=0;j<BOARD_COLUMN;j++){
+			for(int i=0;i<BOARD_ROW;i++){
+				if(state[i][j] == X)	
+					count_x++;
+				if(state[i][j] == O)
+					count_o++;
+			}
+
+			switch(count_x){
+				case 1:x1++;break;
+				case 2:x2++;break;
+				case 3:x3++;break;
+			}
+			switch(count_o){
+				case 1:o1++;break;
+				case 2:o2++;break;
+				case 3:o3++;break;
+			}
+		}
+		
+		count_x = 0, count_o = 0;
+		// check diagnals
+		for(int j=0;j<BOARD_COLUMN;j++){
+			for(int i=0;i<BOARD_ROW;i++){
+				if(state[i][j] == X)	
+					count_x++;
+				if(state[i][j] == O)
+					count_o++;
+			}
+
+			switch(count_x){
+				case 1:x1++;break;
+				case 2:x2++;break;
+				case 3:x3++;break;
+			}
+			switch(count_o){
+				case 1:o1++;break;
+				case 2:o2++;break;
+				case 3:o3++;break;
+			}
+		}
+		cutoff = true;
+		eval = 6 * x3 + 3 * x2 + x1 - (6 * o3 + 3 * o2 +o1);
+		return eval;
 	}
 	
 	curr_dep++;

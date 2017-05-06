@@ -17,7 +17,7 @@ using namespace std;
 enum entry {
 		O, X, E
 	};
- 
+
 class tic_tac_toe{
 
 private:
