@@ -2,15 +2,15 @@
 
 tic_tac_toe::tic_tac_toe(){
 		
-		curr_player = X;
+//		curr_player = X;		
+		
+		last_move = make_pair(-1, -1);
 		
 		step_count = 1; 		
 		board = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
-		
-		last_move = make_pair(-1, -1);
 
 //		step_count = 13; 
-//		board = {{X, X, X, O}, {X, X, O, E}, {O, X, E, E}, {O, O, O, E}};
+//		board =  {{X, X, O, O}, {X, X, O, O}, {E, X, X, E}, {O, E, O, E}};
 		
 	} 
 
@@ -66,7 +66,7 @@ bool tic_tac_toe::check_winner(int row, int column){
 		}
 	}
 	if(result == 0){
-		cout<<"The winner is "<<winner<<endl;
+		cout<<"\nThe winner is "<<winner<<endl;
 		print_board();
 		return true;
 	}
@@ -78,12 +78,13 @@ bool tic_tac_toe::check_winner(int row, int column){
 		}
 	}
 	if(result == 1){
-		cout<<"The winner is "<<winner<<endl;
+		cout<<"\nThe winner is "<<winner<<endl;
 		print_board();
 		return true;
 	}
+	
 	// diagnal
-	if((row == 1 || row == 2) && (column == 1 || column == 2)){
+	if(((row == 1 || row == 2) && (column == 1 || column == 2)) || ((row == 0 || row == 3) && (column == 0 || column == 3))){
 		for(int i=0, j=0;i<BOARD_ROW && j<BOARD_COLUMN;i++, j++){
 			if(board[i][j] != board[row][column]){
 				result++;
@@ -91,7 +92,7 @@ bool tic_tac_toe::check_winner(int row, int column){
 			}
 		}
 		if(result == 2){
-			cout<<"The winner is "<<winner<<endl;
+			cout<<"\nThe winner is "<<winner<<endl;
 			print_board();
 			return true;
 		}
@@ -102,13 +103,16 @@ bool tic_tac_toe::check_winner(int row, int column){
 			}
 		}
 		if(result == 3){
-			cout<<"The winner is "<<winner<<endl;
+			cout<<"\nThe winner is "<<winner<<endl;
 			print_board();
 			return true;
 		}
 	}
-	if(step_count == BOARD_ROW * BOARD_COLUMN)
+	
+	if(step_count == BOARD_ROW * BOARD_COLUMN){
 		cout<<" draw "<<endl;
+		return true;
+	}
 	return false;
 } 
 
@@ -134,5 +138,6 @@ void tic_tac_toe::print_board(){
 		}
 		cout<<endl;
 	}
+	cout<<endl;
 }
 

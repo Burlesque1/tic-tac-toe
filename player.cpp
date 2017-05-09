@@ -2,7 +2,7 @@
 
 player::player(int level){
 	
-//	state = {{X, X, X, O}, {X, X, O, E}, {O, X, E, E}, {O, O, O, E}};
+//	state = {{X, X, O, O}, {X, X, O, O}, {E, X, X, E}, {O, E, O, E}};
 	
 	state = vector<vector<entry>>(BOARD_ROW, vector<entry>(BOARD_COLUMN, E));
 	
@@ -59,7 +59,10 @@ void player::get_last_move(pair<int, int> last_move, int step){
 
 pair<int, int> player::return_move(){	
 	
-	alpha_beta_search();
+//	if(curr_step == 1)
+//		next_move = make_pair(2, 2);
+//	else
+		alpha_beta_search();
 	
 	state[next_move.first][next_move.second] = X;
 	
@@ -227,8 +230,7 @@ void player::alpha_beta_search(){
 				
 				state[i][j] = E;
 				curr_encode -= 2*pow(3, (i * BOARD_COLUMN + j));
-	//			cout<<time(nullptr)-start<<"s "<<v<<" i = "<<i<<" j = "<<j<<endl;	
-				
+//				cout<<"i = "<<i<<" j = "<<j<<" v = "<<v<<endl;
 				if(v > value){
 					value = v;
 					next_move.first = i;
@@ -250,7 +252,7 @@ int player::min_value(int row, int column, int alpha, int beta, int steps, int &
 	}
 	
 	int utility = terminal_test(state);
-	if(utility != 0 || steps == BOARD_ROW * BOARD_COLUMN){
+	if(steps >= 2 && (utility != 0 || steps == BOARD_ROW * BOARD_COLUMN)){
 		memo[curr_encode] = utility;
 		depth = max(curr_dep + 1, depth);	
 		return utility;
